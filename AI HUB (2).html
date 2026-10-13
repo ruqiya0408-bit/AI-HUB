@@ -1,0 +1,1223 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI HUB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: dark-first glass SaaS shell. Sticky glass header, hero with orbiting tool tiles,
+   card grids on a faint grid + violet/blue orb backdrop. Light theme is a toggle, dark is the default. */
+:root{
+  --bg:#07070d; --bg-2:#0e0e19;
+  --surface:rgba(255,255,255,.045); --surface-2:rgba(255,255,255,.08);
+  --line:rgba(255,255,255,.1); --line-strong:rgba(255,255,255,.2);
+  --fg:#f2f2fa; --muted:#a2a2bf;
+  --violet:#8b5cf6; --blue:#3b82ff;
+  --grad:linear-gradient(135deg,#8b5cf6 0%,#3b82ff 100%);
+  --glow:0 0 0 1px rgba(139,92,246,.28),0 12px 48px -14px rgba(99,102,241,.6);
+  --good:#34d399; --good-bg:rgba(52,211,153,.12);
+  --warn:#fbbf24; --warn-bg:rgba(251,191,36,.12);
+  --bad:#fb7185;
+  --orb1:rgba(139,92,246,.28); --orb2:rgba(59,130,255,.22);
+  --header-bg:rgba(9,9,16,.68); --field:rgba(255,255,255,.06); --grid:rgba(255,255,255,.035);
+  --font-display:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+  --font-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f5f5fb; --bg-2:#ececf7;
+  --surface:rgba(255,255,255,.74); --surface-2:rgba(255,255,255,.96);
+  --line:rgba(30,30,90,.12); --line-strong:rgba(30,30,90,.26);
+  --fg:#15152b; --muted:#545474;
+  --violet:#6d3df0; --blue:#2457ff;
+  --grad:linear-gradient(135deg,#6d3df0 0%,#2457ff 100%);
+  --glow:0 0 0 1px rgba(109,61,240,.22),0 14px 40px -16px rgba(60,60,230,.5);
+  --good:#0b8a5f; --good-bg:rgba(11,138,95,.1);
+  --warn:#a15c07; --warn-bg:rgba(161,92,7,.1);
+  --bad:#c0243f;
+  --orb1:rgba(139,92,246,.2); --orb2:rgba(59,130,255,.17);
+  --header-bg:rgba(245,245,251,.74); --field:rgba(255,255,255,.95); --grid:rgba(30,30,90,.05);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100%;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:radial-gradient(60rem 40rem at 85% -10%,var(--orb1),transparent 60%),radial-gradient(50rem 36rem at -10% 25%,var(--orb2),transparent 60%),radial-gradient(44rem 30rem at 55% 115%,var(--orb1),transparent 65%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 0,transparent 72%);mask-image:radial-gradient(ellipse at 50% 0%,#000 0,transparent 72%)}
+img{max-width:100%}
+[hidden]{display:none!important}
+a{color:inherit}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:-.02em}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:.5rem}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{width:100%;max-width:74rem;margin-inline:auto;padding-inline:clamp(1rem,4vw,2rem)}
+.ic{width:1.15em;height:1.15em;flex:none}
+.mono{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* Header */
+.site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--header-bg);-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:1rem;min-height:4.1rem}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;font-family:var(--font-display);font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
+.brand-mark{width:1.9rem;height:1.9rem;border-radius:.6rem;background:var(--grad);box-shadow:var(--glow);position:relative;flex:none}
+.brand-mark::after{content:"";position:absolute;inset:.45rem;border-radius:50%;border:2px solid rgba(255,255,255,.92);border-right-color:transparent;transform:rotate(30deg)}
+.nav{display:flex;gap:.25rem;margin-inline:auto}
+.nav a{text-decoration:none;color:var(--muted);font-weight:500;padding:.5rem .95rem;border-radius:999px;transition:color .2s,background .2s}
+.nav a:hover{color:var(--fg);background:var(--surface)}
+.nav a[aria-current="page"]{color:var(--fg);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line)}
+.actions{display:flex;align-items:center;gap:.5rem}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;min-width:2.5rem;height:2.5rem;padding:0 .75rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s}
+.icon-btn:hover{border-color:var(--line-strong);background:var(--surface-2)}
+.icon-btn .ic{width:1.1rem;height:1.1rem}
+.saved-btn .count{font-family:var(--font-mono);font-size:.78rem}
+.menu-btn{display:none}
+
+/* Buttons, chips, fields */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.35rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:600;text-decoration:none;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s,background .2s}
+.btn:hover{border-color:var(--line-strong);background:var(--surface-2);transform:translateY(-1px)}
+.btn.primary{background:var(--grad);border-color:transparent;color:#fff;box-shadow:var(--glow)}
+.btn.primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn.small{padding:.55rem 1rem;font-size:.9rem}
+.chip{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem .95rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-size:.92rem;font-weight:500;cursor:pointer;transition:all .2s}
+.chip:hover{color:var(--fg);border-color:var(--line-strong)}
+.chip[aria-pressed="true"]{color:#fff;background:var(--grad);border-color:transparent;box-shadow:var(--glow)}
+.field{width:100%;min-width:0;background:var(--field);border:1px solid var(--line);color:var(--fg);font:inherit;padding:.7rem .95rem;border-radius:.85rem;transition:border-color .2s,box-shadow .2s}
+.field:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(139,92,246,.25)}
+.field[aria-invalid="true"]{border-color:var(--bad)}
+.glass{background:var(--surface);border:1px solid var(--line);border-radius:1.25rem;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%)}
+.form-msg{margin-top:.75rem;color:var(--bad);font-size:.92rem;font-weight:500}
+
+/* Hero */
+main{display:block;outline:none;padding-bottom:3rem}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:2.5rem;align-items:center;padding-block:clamp(2.5rem,6vw,5rem) clamp(2rem,4vw,3.5rem)}
+.eyebrow{display:inline-flex;align-items:center;gap:.55rem;padding:.35rem .8rem;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.eyebrow i{width:.5rem;height:.5rem;border-radius:50%;background:var(--grad);box-shadow:0 0 12px var(--violet)}
+.hero h1{font-size:clamp(2.4rem,6.4vw,4.6rem);font-weight:800;margin-block:1.1rem 1.1rem}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.lead{max-width:36rem;font-size:clamp(1.02rem,2vw,1.2rem);color:var(--muted)}
+.searchbar{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-top:1.75rem;padding:.55rem .55rem .55rem 1.1rem;max-width:40rem;border-radius:1.2rem;background:var(--surface-2);border:1px solid var(--line-strong);box-shadow:var(--glow)}
+.searchbar:focus-within{border-color:var(--violet)}
+.searchbar .ic{color:var(--muted);width:1.3rem;height:1.3rem}
+.searchbar input{flex:1 1 12rem;min-width:0;background:transparent;border:0;color:var(--fg);font:inherit;font-size:1.05rem;padding:.7rem .2rem}
+.searchbar input:focus{outline:none}
+.searchbar input::placeholder{color:var(--muted)}
+.quick{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:1rem}
+.cta-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.75rem}
+.hero-stats{margin-top:1.75rem}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+.rise.d2{animation-delay:.08s}.rise.d3{animation-delay:.16s}.rise.d4{animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:var(--glow)}50%{box-shadow:0 0 0 1px rgba(139,92,246,.4),0 14px 70px -8px rgba(99,102,241,.85)}}
+
+/* Orbit */
+.orbit{--size:min(26rem,calc(100vw - 2rem));position:relative;width:var(--size);height:var(--size);margin-inline:auto}
+.ring{position:absolute;border-radius:50%;border:1px dashed var(--line-strong);opacity:.7}
+.ring.r1{inset:1.7rem}
+.ring.r2{inset:calc(var(--size) * .19)}
+.core{position:absolute;inset:36%;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:1.5rem;color:#fff;animation:pulse 5s ease-in-out infinite}
+.spin{position:absolute;inset:0;animation:spin 80s linear infinite}
+.spin.outer{--r:calc(var(--size) / 2 - 1.7rem)}
+.spin.inner{--r:calc(var(--size) * .31);animation-duration:60s;animation-direction:reverse}
+.slot{position:absolute;top:50%;left:50%;width:0;height:0;transform:rotate(var(--a)) translateX(var(--r)) rotate(calc(var(--a) * -1))}
+.tile{position:absolute;overflow:hidden;width:3.4rem;height:3.4rem;margin:-1.7rem 0 0 -1.7rem;border-radius:1rem;border:1px solid rgba(255,255,255,.25);color:#fff;font-family:var(--font-display);font-weight:700;font-size:1rem;cursor:pointer;display:grid;place-items:center;animation:spin 80s linear infinite reverse;box-shadow:0 8px 24px -8px rgba(0,0,0,.5);transition:filter .2s,box-shadow .2s}
+.spin.inner .tile{animation-duration:60s;animation-direction:normal}
+.tile:hover{filter:brightness(1.15);box-shadow:var(--glow)}
+
+/* Logos: official site icon sits over the monogram once it has loaded */
+.logo-img{display:none;width:62%;height:62%;object-fit:contain}
+.has-logo .logo-img{display:block}
+.has-logo .mono-letters{display:none}
+.mono-tile.has-logo,.tile.has-logo{background:#fff!important;border-color:var(--line)}
+
+/* Sections */
+.section{padding-block:clamp(1.75rem,4vw,3rem)}
+.section-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}
+.section-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);font-weight:700}
+.section-head p{color:var(--muted);margin-top:.4rem;max-width:34rem}
+.link-arrow{display:inline-flex;align-items:center;gap:.4rem;font-weight:600;text-decoration:none;color:var(--fg);padding:.35rem 0;border-bottom:1px solid var(--line-strong)}
+.link-arrow:hover{border-color:var(--violet)}
+.page-head{padding-block:clamp(2rem,5vw,3.5rem) 1.5rem}
+.page-head h1{font-size:clamp(2.1rem,5vw,3.4rem);font-weight:800;margin-top:.7rem}
+.page-head p{color:var(--muted);margin-top:.8rem;max-width:40rem}
+
+/* Cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,17.5rem),1fr));gap:1rem}
+.card{position:relative;display:flex;flex-direction:column;gap:.55rem;padding:1.25rem;min-width:0;transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(139,92,246,.55);box-shadow:var(--glow)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem}
+.mono-tile{display:grid;place-items:center;flex:none;overflow:hidden;width:3rem;height:3rem;border-radius:.95rem;color:#fff;font-family:var(--font-display);font-weight:700;font-size:1rem;border:1px solid rgba(255,255,255,.22)}
+.mono-tile.lg{width:4.25rem;height:4.25rem;border-radius:1.2rem;font-size:1.35rem}
+.card h3{font-size:1.28rem;font-weight:700;margin-top:.35rem}
+.card h3 a{text-decoration:none}
+.card h3 a::after{content:"";position:absolute;inset:0;border-radius:1.25rem}
+.maker{font-size:.84rem;color:var(--muted)}
+.tagline{color:var(--muted);font-size:.96rem;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem}
+.tag{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:999px;border:1px solid var(--line);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.tag.free{color:var(--good);background:var(--good-bg);border-color:transparent}
+.tag.paid{color:var(--warn);background:var(--warn-bg);border-color:transparent}
+.fav{position:relative;z-index:2;display:inline-grid;place-items:center;width:2.4rem;height:2.4rem;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;transition:color .2s,border-color .2s,background .2s,transform .2s}
+.fav:hover{color:var(--fg);border-color:var(--line-strong);transform:scale(1.06)}
+.fav[aria-pressed="true"]{color:#fb6aa8;border-color:rgba(251,106,168,.5);background:rgba(251,106,168,.12)}
+.fav[aria-pressed="true"] .ic{fill:currentColor}
+.fav.text{width:auto;padding:0 1rem;border-radius:999px;gap:.5rem;font:inherit;font-weight:600;display:inline-flex;align-items:center;height:auto;padding-block:.8rem}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13.5rem),1fr));gap:.85rem}
+.cat{display:flex;flex-direction:column;gap:.7rem;align-items:flex-start;padding:1.15rem;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s}
+.cat:hover{transform:translateY(-3px);border-color:rgba(59,130,255,.55);box-shadow:var(--glow)}
+.cat .ico{display:grid;place-items:center;width:2.6rem;height:2.6rem;border-radius:.85rem;background:var(--grad);color:#fff}
+.cat .ico .ic{width:1.3rem;height:1.3rem}
+.cat strong{font-family:var(--font-display);font-size:1.1rem}
+.cat small{color:var(--muted);font-family:var(--font-mono);font-size:.74rem;letter-spacing:.05em}
+
+/* Advisor CTA */
+.cta-band{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.25rem;padding:clamp(1.5rem,4vw,2.5rem);border-radius:1.6rem;background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(59,130,255,.16)),var(--surface);border:1px solid var(--line-strong);box-shadow:var(--glow)}
+.cta-band h2{font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:700}
+.cta-band p{color:var(--muted);margin-top:.5rem;max-width:32rem}
+
+/* Explore */
+.filters{padding:1rem;display:flex;flex-direction:column;gap:.9rem}
+.search-field{position:relative}
+.search-field .ic{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-field .field{padding-left:2.6rem;font-size:1.02rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.selects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:.6rem;align-items:end}
+.selects label{display:flex;flex-direction:column;gap:.3rem}
+.result-count{margin-block:1.1rem .9rem;color:var(--muted);font-size:.95rem}
+.empty{padding:2.5rem 1.5rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.empty h3{font-size:1.4rem}
+.empty p{color:var(--muted);max-width:28rem}
+.grid>.empty{grid-column:1/-1}
+
+/* Details */
+.crumb{display:inline-flex;align-items:center;gap:.4rem;margin-block:1.5rem 1rem;color:var(--muted);text-decoration:none;font-weight:500}
+.crumb:hover{color:var(--fg)}
+.crumb .ic{transform:rotate(180deg)}
+.detail-head{display:flex;flex-wrap:wrap;gap:1.25rem;align-items:center;padding:clamp(1.25rem,3vw,2rem)}
+.detail-head .who{flex:1 1 18rem;min-width:0}
+.detail-head h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800}
+.detail-head .tagline{font-size:1.1rem;margin-top:.5rem}
+.detail-actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.1rem}
+.detail-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:start}
+.stack{display:flex;flex-direction:column;gap:1rem;min-width:0}
+.panel{padding:1.4rem}
+.panel h2{font-size:1.25rem;font-weight:700;margin-bottom:.8rem}
+.panel p{color:var(--muted)}
+.bullets{display:flex;flex-direction:column;gap:.6rem}
+.bullets li{position:relative;padding-left:1.35rem;color:var(--fg)}
+.bullets li::before{content:"";position:absolute;left:0;top:.62em;width:.55rem;height:.55rem;border-radius:50%;background:var(--grad)}
+.bullets.warn li::before{background:var(--warn)}
+.note{margin-top:.8rem;font-size:.86rem;color:var(--muted);padding:.7rem .85rem;border-radius:.8rem;background:var(--warn-bg);border:1px solid transparent}
+.kv{display:flex;flex-direction:column;gap:.9rem}
+.kv div{display:flex;flex-direction:column;gap:.25rem}
+.mini{display:flex;align-items:center;gap:.75rem;padding:.7rem;border-radius:.9rem;text-decoration:none;border:1px solid var(--line);background:var(--surface);transition:border-color .2s}
+.mini:hover{border-color:var(--violet)}
+.mini .mono-tile{width:2.5rem;height:2.5rem;border-radius:.8rem;font-size:.85rem}
+.mini span{display:flex;flex-direction:column;min-width:0}
+.mini small{color:var(--muted)}
+
+/* Advisor */
+.advisor-wrap{display:grid;gap:1rem}
+.q{border:1px solid var(--line);border-radius:1.25rem;background:var(--surface);padding:1.25rem;margin:0;min-width:0;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.q.has-error{border-color:var(--bad)}
+.q legend{padding:0;float:left;width:100%;margin-bottom:.9rem}
+.q legend+*{clear:both}
+.qlabel{display:block;font-family:var(--font-display);font-weight:700;font-size:1.3rem;margin-top:.25rem}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13.5rem),1fr));gap:.6rem}
+.opt{position:relative;display:block;cursor:pointer}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt-body{display:flex;flex-direction:column;gap:.15rem;height:100%;padding:.85rem 1rem;border-radius:.95rem;border:1px solid var(--line);background:var(--field);transition:border-color .2s,background .2s,box-shadow .2s}
+.opt-body strong{font-weight:600}
+.opt-body small{color:var(--muted);font-size:.84rem}
+.opt:hover .opt-body{border-color:var(--line-strong)}
+.opt input:checked+.opt-body{border-color:var(--violet);background:linear-gradient(135deg,rgba(139,92,246,.22),rgba(59,130,255,.16));box-shadow:var(--glow)}
+.opt input:focus-visible+.opt-body{outline:2px solid var(--blue);outline-offset:2px}
+.err{margin-top:.7rem;color:var(--bad);font-size:.9rem;font-weight:500}
+.form-actions{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.results{margin-top:2rem;display:flex;flex-direction:column;gap:1rem;scroll-margin-top:6rem}
+.results h2{font-size:clamp(1.6rem,3.4vw,2.2rem);font-weight:700}
+.rec{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;padding:1.4rem}
+.rec-head{display:flex;flex-wrap:wrap;align-items:center;gap:1rem}
+.rec-head .who{flex:1 1 14rem;min-width:0}
+.rec-head h3{font-size:1.5rem;font-weight:700}
+.rank{display:inline-block;margin-bottom:.35rem}
+.rank.top{color:var(--violet)}
+.rec-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:1.25rem}
+.rec-cols h4{margin:0 0 .5rem;font-family:var(--font-mono);font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.rec-actions{display:flex;flex-wrap:wrap;gap:.6rem}
+.disclaimer{font-size:.88rem;color:var(--muted);padding:.9rem 1.1rem;border-radius:1rem;border:1px dashed var(--line-strong)}
+
+/* Footer + toast */
+.site-footer{border-top:1px solid var(--line);padding-block:2rem 2.5rem;color:var(--muted);font-size:.9rem}
+.site-footer .wrap{display:flex;flex-direction:column;gap:.5rem}
+.site-footer strong{color:var(--fg);font-family:var(--font-display)}
+.toast{position:fixed;left:50%;bottom:calc(1.25rem + env(safe-area-inset-bottom,0px));transform:translate(-50%,1rem);opacity:0;pointer-events:none;z-index:60;padding:.7rem 1.2rem;border-radius:999px;background:var(--surface-2);border:1px solid var(--line-strong);box-shadow:var(--glow);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);font-weight:500;transition:opacity .25s,transform .25s;max-width:calc(100vw - 2rem)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Responsive */
+@media (max-width:60rem){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .detail-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:48rem){
+  .menu-btn{display:inline-flex}
+  .nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;margin:0;padding:.75rem clamp(1rem,4vw,2rem) 1rem;background:var(--header-bg);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+  .site-header.open .nav{display:flex}
+  .nav a{padding:.8rem 1rem;font-size:1.05rem}
+  .saved-btn .label{display:none}
+  .actions{margin-left:auto}
+}
+@media (max-width:30rem){
+  .searchbar{padding-left:.9rem}
+  .searchbar .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap bar">
+    <a class="brand" href="#home" data-go="home" aria-label="AI HUB bosh sahifasi"><span class="brand-mark" aria-hidden="true"></span><span>AI HUB</span></a>
+    <nav class="nav" id="nav" aria-label="Asosiy menyu">
+      <a href="#home" data-go="home" data-nav="home">Bosh sahifa</a>
+      <a href="#explore" data-go="explore" data-nav="explore">AI katalogi</a>
+      <a href="#advisor" data-go="advisor" data-nav="advisor">AI maslahatchi</a>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn saved-btn" id="savedBtn" type="button" aria-label="Saqlangan vositalarni koʻrsatish"><span id="savedIcon"></span><span class="label">Saqlangan</span><span class="count" id="savedCount">0</span></button>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Yorugʻ rejimga oʻtish"></button>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menyuni ochish"></button>
+    </div>
+  </div>
+</header>
+
+<main id="view" tabindex="-1"></main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <strong>AI HUB</strong>
+    <p>Boshlangʻich loyiha. Katalog qoʻlda yozilgan namuna va toʻliq emas. Tavsiflar har bir vositaning ommaga maʼlum imkoniyatlarini qisqacha bayon qiladi. Rejalar, limitlar va narxlar tez-tez oʻzgaradi, shuning uchun qaror qilishdan oldin rasmiy saytdan tekshiring.</p>
+    <p>Tavsiyalar shu sahifadagi katalog va oddiy hisoblash qoidalariga asoslanadi. Jonli AI model yoki API ulanmagan.</p>
+    <p>Vosita belgilari (logotiplar) tegishli kompaniyalarning rasmiy sayt domenlaridan yuklanadi va ularga tegishli.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Icons ---------- */
+  var ICONS = {
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+    moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    close: '<path d="M18 6 6 18M6 6l12 12"/>',
+    ext: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>',
+    arrow: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+    chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    code: '<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>',
+    pen: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/>',
+    video: '<rect x="2" y="5" width="14" height="14" rx="2"/><path d="m22 8-6 4 6 4z"/>',
+    design: '<path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.59 7.59"/><circle cx="11" cy="11" r="2"/>',
+    zap: '<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+    cap: '<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>',
+    brief: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'
+  };
+  function ic(name, cls) {
+    return '<svg class="ic ' + (cls || '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[name] + '</svg>';
+  }
+
+  /* ---------- Catalog data (Uzbek) ---------- */
+  var CATEGORIES = [
+    { id: 'chat', label: 'Suhbat va tadqiqot', icon: 'chat', blurb: 'Savol bering, hujjatlarni tahlil qiling, manbali javob oling.' },
+    { id: 'coding', label: 'Dasturlash', icon: 'code', blurb: 'Dastur yozish, tushuntirish va xatolarini topish.' },
+    { id: 'writing', label: 'Yozuv', icon: 'pen', blurb: 'Matn tuzish, tahrirlash va sayqallash.' },
+    { id: 'image', label: 'Rasm yaratish', icon: 'image', blurb: 'Gʻoyalarni tasvirga aylantirish.' },
+    { id: 'video', label: 'Video', icon: 'video', blurb: 'Video yaratish va montaj qilish.' },
+    { id: 'design', label: 'Dizayn', icon: 'design', blurb: 'Maketlar, grafika va interfeyslar.' },
+    { id: 'productivity', label: 'Samaradorlik', icon: 'zap', blurb: 'Qaydlar, uchrashuvlar va kundalik ish.' },
+    { id: 'education', label: 'Taʼlim', icon: 'cap', blurb: 'Oʻqish, repetitorlik va tezroq oʻrganish.' },
+    { id: 'business', label: 'Biznes', icon: 'brief', blurb: 'Marketing, savdo va jamoa ishi.' }
+  ];
+  var GOALS = [
+    { id: 'research', label: 'Maʼlumot qidirish va javob olish', hint: 'Faktlarni topish, manbalarni solishtirish, xulosa qilish' },
+    { id: 'coding', label: 'Kod yozish yoki xatoni tuzatish', hint: 'Dastur yaratish, xatolarni topish' },
+    { id: 'writing', label: 'Matn yozish yoki yaxshilash', hint: 'Xatlar, insholar, maqolalar' },
+    { id: 'images', label: 'Rasm yaratish', hint: 'Illyustratsiya, sanʼat, mahsulot tasvirlari' },
+    { id: 'video', label: 'Video yaratish', hint: 'Roliklar, taqdimotlar, avatarlar' },
+    { id: 'design', label: 'Dizayn qilish', hint: 'Plakat, ijtimoiy tarmoq postlari, interfeys' },
+    { id: 'productivity', label: 'Kundalik ishni tezlashtirish', hint: 'Qaydlar, uchrashuvlar, tartib' },
+    { id: 'learning', label: 'Mavzuni oʻrganish', hint: 'Oʻqish, mashq qilish, tushuntirish olish' },
+    { id: 'business', label: 'Biznesni rivojlantirish', hint: 'Marketing, kontent, jamoa ishi' }
+  ];
+  var BUDGETS = [
+    { id: 'free', label: 'Faqat bepul', hint: 'Bepul rejasi borlarini koʻrsat' },
+    { id: 'freemium', label: 'Avval bepul, kerak boʻlsa pullik', hint: 'Bepul boshlab, keyin oshirish' },
+    { id: 'paid', label: 'Pullisi ham boʻladi', hint: 'Narxdan koʻra moslik muhimroq' }
+  ];
+  var LEVELS = [
+    { id: 'beginner', label: 'Yangi boshlovchi', hint: 'AI vositalarini endi boshlayapman' },
+    { id: 'intermediate', label: 'Biroz tajribam bor', hint: 'Vaqti-vaqti bilan foydalanaman' },
+    { id: 'advanced', label: 'Ilgʻor', hint: 'Texnik vositalar bilan erkin ishlayman' }
+  ];
+  var LEVEL_TEXT = { beginner: 'Yangi boshlovchilarga mos', intermediate: 'Biroz tajriba kerak', advanced: 'Ilgʻor foydalanuvchilar uchun' };
+  var LEVEL_RANK = { beginner: 0, intermediate: 1, advanced: 2 };
+  var PRICE_TEXT = { free: 'Bepul', freemium: 'Bepul reja mavjud', paid: 'Pullik', varies: 'Turlicha' };
+  var PRICE_NOTE = 'Rejalar, limitlar va narxlar tez-tez oʻzgaradi. Bu sahifada narxlar koʻrsatilmagan; amaldagi shartlarni rasmiy saytdan tekshiring.';
+
+  var TOOLS = [
+    {
+      id: 'claude', name: 'Claude', mono: 'Cl', hue: 262, maker: 'Anthropic', url: 'https://claude.ai',
+      cats: ['chat', 'coding', 'writing'], goals: ['writing', 'coding', 'research', 'learning', 'productivity'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'Uzun hujjatlar, yozuv va kod uchun puxta AI yordamchi.',
+      description: 'Claude — Anthropic kompaniyasining AI yordamchisi. U bilan suhbatlashib, uzun hujjatlarni tahlil qilish, matn yozish va tahrirlash, murakkab masalalarni mulohaza qilish hamda dasturlashda yordam olish mumkin.',
+      does: ['Suhbat shaklida savollarga javob beradi', 'Uzun hujjat va fayllarni oʻqib, xulosa qiladi', 'Matn yozadi, qayta yozadi va tahrirlaydi', 'Kodni tushuntiradi, yozadi va xatolarini topadi'],
+      uses: ['Uzun hisobotni qisqartirib, asosiy xavflarni sanash', 'Insho yoki xatni uslubingizni saqlagan holda ixchamlashtirish', 'Xato xabarini tushuntirib, yechim taklif qilish'],
+      pros: ['Uzun va tuzilgan matnlar hamda puxta tahlilda kuchli', 'Yuklangan hujjatlar bilan ishlay oladi', 'Bepul reja bilan avval sinab koʻrish mumkin'],
+      cons: ['Ayniqsa bepul rejalarda foydalanish limitlari bor', 'Baribir notoʻgʻri maʼlumot berishi mumkin, muhim narsalarni tekshiring', 'Baʼzi imkoniyatlar reja va hudud boʻyicha farq qiladi'],
+      keywords: 'assistant chatbot yordamchi suhbat summarize summary pdf hujjat xulosa insho xat email code kod dasturlash programming tahlil analysis reasoning'
+    },
+    {
+      id: 'chatgpt', name: 'ChatGPT', mono: 'CG', hue: 245, maker: 'OpenAI', url: 'https://chatgpt.com',
+      cats: ['chat', 'writing', 'coding', 'image'], goals: ['research', 'writing', 'coding', 'images', 'learning', 'productivity'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'Suhbat, yozuv, kod va rasm uchun universal yordamchi.',
+      description: 'ChatGPT — OpenAI kompaniyasining suhbatdosh yordamchisi. Savollarga javob berishdan tortib matn yozish, dasturlashda yordam, maʼlumotlar tahlili va (qoʻllab-quvvatlanadigan rejalarda) rasm yaratishgacha koʻp kundalik ishni bitta ilovada bajaradi.',
+      does: ['Suhbatlashadi va savollarga javob beradi', 'Matn yozadi va tahrirlaydi', 'Kod va maʼlumotlar tahlilida yordam beradi', 'Qoʻllab-quvvatlanadigan rejalarda rasm yaratadi'],
+      uses: ['Oʻqish jadvalini tuzish va oʻzingizni sinash', 'Qoralama qaydlarni toza hujjatga aylantirish', 'Loyiha uchun tezkor konsept rasm yaratish'],
+      pros: ['Juda koʻp vazifa bir joyda', 'Foydalanuvchilar jamoasi katta, qoʻllanmalar koʻp', 'Bepul reja mavjud'],
+      cons: ['Imkoniyat va limitlar reja boʻyicha farq qiladi', 'Ishonch bilan xato javob berishi mumkin', 'Tadqiqot uchun javoblarni tekshirish kerak'],
+      keywords: 'assistant chatbot gpt openai yordamchi rasm surat logo chizma uyga vazifa insho jadval maʼlumot tahlil picture photo drawing homework essay spreadsheet data analysis'
+    },
+    {
+      id: 'gemini', name: 'Gemini', mono: 'Ge', hue: 225, maker: 'Google', url: 'https://gemini.google.com',
+      cats: ['chat', 'productivity'], goals: ['research', 'writing', 'productivity', 'learning', 'images'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'Google ekotizimi bilan bogʻlangan Google AI yordamchisi.',
+      description: 'Gemini — Google ning AI yordamchisi. Matn, rasm va boshqa turdagi maʼlumotlar bilan ishlaydi, rejangiz qoʻllasa Gmail, Docs va Drive kabi Google xizmatlari bilan birga ishlay oladi.',
+      does: ['Savollarga javob beradi va gʻoya beradi', 'Matn yozish va xulosa qilishga yordam beradi', 'Matn bilan birga rasmlar bilan ham ishlaydi', 'Qoʻllab-quvvatlanadigan rejalarda Google ilovalariga ulanadi'],
+      uses: ['Uzun email yozishmasini qisqartirish', 'Loyiha uchun nom va reja boʻyicha gʻoyalar topish', 'Uy vazifasi rasmini tushuntirish'],
+      pros: ['Google ilovalaridan foydalansangiz juda qulay', 'Rasm va matnni birga tushunadi', 'Google akkaunti bilan bepul kirish mumkin'],
+      cons: ['Baʼzi integratsiyalar rejaga bogʻliq', 'Imkoniyatlar mamlakatga qarab farq qilishi mumkin', 'Javoblarni baribir tekshirish kerak'],
+      keywords: 'google assistant chatbot yordamchi gmail docs drive xulosa email rasm surat summarize image photo'
+    },
+    {
+      id: 'perplexity', name: 'Perplexity', mono: 'Px', hue: 205, maker: 'Perplexity AI', url: 'https://www.perplexity.ai',
+      cats: ['chat'], goals: ['research', 'learning'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'Internetdan qidirib, manbalarini koʻrsatadigan javob tizimi.',
+      description: 'Perplexity AI ni jonli internet qidiruvi bilan birlashtiradi. Savol berasiz, u foydalangan manbalarga havolalar bilan yozma javob beradi, shunda maʼlumot qayerdan olinganini tekshirish oson.',
+      does: ['Internetdan qidirib qisqa javob yozadi', 'Fikrlar yonida manba havolalarini koʻrsatadi', 'Davomli savollarni kontekstda qabul qiladi', 'Veb-sahifalarni qisqartirishga yordam beradi'],
+      uses: ['Yangi manbalar asosida ikki mahsulotni solishtirish', 'Notanish mavzu boʻyicha tezkor sharh olish', 'Insho uchun manbalar topish'],
+      pros: ['Manbalar koʻrinadi, shuning uchun tekshirish oson', 'Yangiliklar va dolzarb savollar uchun tez', 'Bepul reja mavjud'],
+      cons: ['Manba sifati har xil, havolalarni oching', 'Uzun ijodiy yozuv uchun moʻljallanmagan', 'Baʼzi ilgʻor imkoniyatlar pullik rejada'],
+      keywords: 'search engine qidiruv manba sources citations web internet yangilik news fakt solishtirish compare research tadqiqot'
+    },
+    {
+      id: 'ms-copilot', name: 'Microsoft Copilot', mono: 'MC', hue: 215, maker: 'Microsoft', url: 'https://copilot.microsoft.com',
+      cats: ['chat', 'productivity'], goals: ['research', 'productivity', 'writing'],
+      level: 'beginner', pricing: 'freemium', popular: false,
+      tagline: 'Windows, Edge va Microsoft 365 uchun Microsoft yordamchisi.',
+      description: 'Copilot — Microsoft ning AI yordamchisi. Savollarga javob beradi, yozishga yordam beradi, Windows va Edge brauzeri bilan ishlaydi, mos litsenziya boʻlsa Word, Excel va Outlook kabi Microsoft 365 ilovalariga ham ulanadi.',
+      does: ['Suhbatlashadi va savollarga javob beradi', 'Matn yozish va xulosa qilishga yordam beradi', 'Litsenziya boʻlsa Microsoft 365 ilovalari ichida yordam beradi', 'Windows va Edge brauzeridan ishlaydi'],
+      uses: ['Uzun xatga javob qoralamasini yozish', 'Word dagi hujjatni qisqartirish', 'Internetda koʻrib chiqayotganda tezkor savol berish'],
+      pros: ['Windows va Office ishlatsangiz qulay', 'Oddiy yordamchi bepul ishlaydi', 'Tanish ilovalar, oʻrganish kam'],
+      cons: ['Microsoft 365 bilan chuqur ishlash uchun litsenziya kerak', 'Turli Copilot mahsulotlarini adashtirish oson', 'Natija sifati vazifaga qarab farq qiladi'],
+      keywords: 'microsoft windows office word excel outlook edge assistant chatbot yordamchi'
+    },
+    {
+      id: 'github-copilot', name: 'GitHub Copilot', mono: 'GC', hue: 270, maker: 'GitHub (Microsoft)', url: 'https://github.com/features/copilot',
+      cats: ['coding'], goals: ['coding'],
+      level: 'intermediate', pricing: 'freemium', popular: true,
+      tagline: 'Kod muharriri ichida ishlaydigan AI hamkor dasturchi.',
+      description: 'GitHub Copilot yozayotganingizda kod taklif qiladi va Visual Studio Code kabi muharrirlar ichidan kodingiz haqidagi savollarga javob beradi. Takroriy ishni tezlashtiradi va notanish kodni tushunishga yordam beradi.',
+      does: ['Yozish vaqtida kod davomini taklif qiladi', 'Chat oynasida kod haqidagi savollarga javob beradi', 'Notanish kodni tushuntiradi', 'Testlar yozish va xatolarni tuzatishga yordam beradi'],
+      uses: ['Yangi funksiya uchun tayyor shablon yaratish', 'Tushunarsiz kod nima qilishini soʻrash', 'Mavjud kod uchun unit testlar qoralamasini yozish'],
+      pros: ['Siz ishlatadigan muharrir ichida ishlaydi', 'Takroriy kodni yozishda vaqtni tejaydi', 'Cheklangan bepul tarifi bor'],
+      cons: ['Takliflar notoʻgʻri yoki xavfsiz boʻlmasligi mumkin, tekshirib chiqing', 'Kodni oʻqiy olsangiz eng yaxshi ishlaydi', 'Bepul tarifda limitlar bor'],
+      keywords: 'programming developer dasturchi vscode ide autocomplete github debug xato tests test software dastur kod dasturlash'
+    },
+    {
+      id: 'cursor', name: 'Cursor', mono: 'Cu', hue: 280, maker: 'Anysphere', url: 'https://cursor.com',
+      cats: ['coding'], goals: ['coding'],
+      level: 'intermediate', pricing: 'freemium', popular: false,
+      tagline: 'AI suhbat va koʻp fayllarni tahrirlash asosida qurilgan kod muharriri.',
+      description: 'Cursor — ichiga AI oʻrnatilgan kod muharriri. Oʻzgarishni oddiy tilda tasvirlaysiz, u bir nechta faylda tahrir taklif qila oladi, ish usuli esa Visual Studio Code ga oʻxshash qoladi.',
+      does: ['Butun kod bazasi haqida suhbatlashadi', 'Bir nechta fayl boʻylab tahrirlar taklif qiladi', 'Yozish vaqtida kodni davom ettiradi', 'Xatolarni topishga yordam beradi'],
+      uses: ['Yangi imkoniyat soʻrab, taklif etilgan oʻzgarishlarni koʻrib chiqish', 'Tartibsiz faylni qayta tuzish (refaktoring)', 'Xato qayerdan boshlanganini topish'],
+      pros: ['Koʻp faylga tegadigan oʻzgarishlarda kuchli', 'Tanish muharrir hissi', 'Sinab koʻrish uchun bepul reja bor'],
+      cons: ['Rejalarda limit bor, koʻp foydalansangiz qimmatlashishi mumkin', 'Oddiy chatbotdan koʻra oʻrganish koʻproq', 'Har bir oʻzgarishni baribir oʻzingiz koʻrib chiqishingiz kerak'],
+      keywords: 'programming developer dasturchi editor muharrir ide vscode refactor debug software agent kod dasturlash'
+    },
+    {
+      id: 'grammarly', name: 'Grammarly', mono: 'Gr', hue: 250, maker: 'Grammarly', url: 'https://www.grammarly.com',
+      cats: ['writing'], goals: ['writing', 'business'],
+      level: 'beginner', pricing: 'freemium', popular: false,
+      tagline: 'Yozgan joyingizda grammatika, aniqlik va ohangga yordam.',
+      description: 'Grammarly yozayotganingizda matnni tekshiradi. Grammatika va imloni belgilaydi, aniqroq ifoda va ohang taklif qiladi, brauzer, hujjat va dastur ichida AI yordamida qayta yozishni ham beradi. Asosan ingliz tilidagi matnlar uchun moʻljallangan.',
+      does: ['Grammatika va imloni tekshiradi', 'Aniqroq va qisqaroq ifoda taklif qiladi', 'Oʻquvchiga mos ohangni sozlaydi', 'Qoʻllab-quvvatlanadigan rejalarda AI bilan qayta yozadi'],
+      uses: ['Ish uchun xat (cover letter) ni sayqallash', 'Ish xatini samimiyroq qilish', 'Hisobotdagi xatolarni topish'],
+      pros: ['Koʻp ilova va saytlarda ishlaydi', 'Oddiy, oʻrganish oson', 'Asosiy tekshiruv uchun foydali bepul reja'],
+      cons: ['Ilgʻor AI imkoniyatlari pullik rejada', 'Takliflar shaxsiy uslubingizni tekislab yuborishi mumkin', 'Asosan ingliz tili uchun moʻljallangan; umumiy suhbat yordamchisi emas'],
+      keywords: 'grammar grammatika spelling imlo proofread edit tahrir rewrite tone ohang email essay cover letter ingliz'
+    },
+    {
+      id: 'jasper', name: 'Jasper', mono: 'Ja', hue: 290, maker: 'Jasper', url: 'https://www.jasper.ai',
+      cats: ['writing', 'business'], goals: ['writing', 'business'],
+      level: 'intermediate', pricing: 'paid', popular: false,
+      tagline: 'Marketing jamoalariga moʻljallangan AI kontent platformasi.',
+      description: 'Jasper marketing va kontent jamoalari uchun yaratilgan. Reklama, blog maqolalari va kampaniya materiallari kabi brend ohangiga mos matnlarni tayyorlashga yordam beradi, jamoalar uchun umumiy brend ovozi sozlamalari bor.',
+      does: ['Marketing matnlari va blog maqolalarini yozadi', 'Brend ohangini bir xil saqlaydi', 'Jamoa ish jarayonlarini qoʻllab-quvvatlaydi', 'Kontentni turli kanallar uchun qayta ishlaydi'],
+      uses: ['Bitta mahsulot uchun bir nechta reklama varianti yozish', 'Blog maqolasini ijtimoiy tarmoq postlariga aylantirish', 'Kampaniya matnlarini jamoa boʻylab bir xil saqlash'],
+      pros: ['Marketing ish jarayoniga moslab yaratilgan', 'Jamoalar uchun brend ovozi imkoniyatlari', 'Umumiy chatbotga qaraganda kamroq sozlash kerak'],
+      cons: ['Pullik mahsulot; sinov borligini saytdan tekshiring', 'Shaxsiy foydalanish uchun ortiqcha boʻlishi mumkin', 'Umumiy chatbotlar bu ishning koʻp qismini qila oladi'],
+      keywords: 'marketing copywriting ads reklama blog seo campaign kampaniya brand brend social media kontent content'
+    },
+    {
+      id: 'canva', name: 'Canva', mono: 'Ca', hue: 235, maker: 'Canva', url: 'https://www.canva.com',
+      cats: ['design', 'image', 'business'], goals: ['design', 'images', 'business', 'video'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'AI vositalari ichiga oʻrnatilgan, sudrab-tashlash usulidagi dizayn.',
+      description: 'Canva — ijtimoiy tarmoq postlari, taqdimotlar, plakatlar va video uchun shablonlari bor onlayn dizayn vositasi. AI imkoniyatlari rasm yaratish, suratlarni tahrirlash va dizayn ichida matn yozishga yordam beradi.',
+      does: ['Shablonlardan post, slayd, plakat va logo yasaydi', 'AI bilan rasm yaratadi va suratlarni tahrirlaydi', 'Dizayn ichida matn qoralamasini yozadi', 'Oddiy videolar yaratadi'],
+      uses: ['Bir necha daqiqada Instagram posti yasash', 'Dars uchun toza taqdimot tayyorlash', 'Mahsulot suratining fonini olib tashlash'],
+      pros: ['Yangi boshlovchilar uchun juda qulay', 'Shablonlar kutubxonasi katta', 'Bepul reja asosiy ehtiyojni qoplaydi'],
+      cons: ['Baʼzi AI va premium imkoniyatlar pullik rejada', 'Shablonga asoslangan dizaynlar tanish koʻrinishi mumkin', 'Professional dizayn dasturlariga qaraganda nazorat kamroq'],
+      keywords: 'logo plakat poster flyer social media instagram taqdimot presentation slides shablon template grafika dizayn surat photo edit fon background video'
+    },
+    {
+      id: 'firefly', name: 'Adobe Firefly', mono: 'Af', hue: 275, maker: 'Adobe', url: 'https://firefly.adobe.com',
+      cats: ['image', 'design'], goals: ['images', 'design'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'Adobe ning rasm, effekt va dizayn uchun generativ AI vositasi.',
+      description: 'Adobe Firefly matnli soʻrovdan rasm yaratadi va tahrirlaydi, Photoshop va Illustrator kabi Adobe ilovalari bilan ishlaydi. Adobe uni tijorat maqsadlari uchun moʻljallangan deb taqdim etadi, shuning uchun rejangiz uchun joriy shartlarni oʻqing.',
+      does: ['Matnli soʻrovdan rasm yaratadi', 'Rasmlarni tahrirlaydi, masalan joyni toʻldiradi yoki kengaytiradi', 'Matn effektlari va vektorga oʻxshash grafika yaratadi', 'Adobe ilovalari bilan ulanadi'],
+      uses: ['Plakat uchun fon yaratish', 'Suratni asl kadridan tashqariga kengaytirish', 'Logo gʻoyasi uchun bir necha vizual uslubni sinash'],
+      pros: ['Adobe ish jarayoniga yaxshi mos tushadi', 'Ijodkor mutaxassislarga moʻljallangan', 'Sinab koʻrish uchun cheklangan bepul foydalanish bor'],
+      cons: ['Bepul foydalanish kreditlar bilan cheklangan', 'Adobe ilovalaridan foydalansangiz foydaliroq', 'Tijoriy loyihalar uchun litsenziya shartlarini tekshiring'],
+      keywords: 'rasm surat picture photo art sanʼat illyustratsiya illustration logo generate prompt photoshop illustrator fon background'
+    },
+    {
+      id: 'midjourney', name: 'Midjourney', mono: 'Mj', hue: 300, maker: 'Midjourney', url: 'https://www.midjourney.com',
+      cats: ['image'], goals: ['images', 'design'],
+      level: 'intermediate', pricing: 'paid', popular: false,
+      tagline: 'Oʻziga xos badiiy koʻrinishi bilan mashhur rasm yaratish vositasi.',
+      description: 'Midjourney matnli soʻrovdan rasm yaratadi va uslubiy, badiiy natijalari bilan mashhur. U obuna asosidagi xizmat, shuning uchun kirish joriy holatda qanday ishlashini rasmiy saytdan tekshiring.',
+      does: ['Matnli soʻrovdan rasm yaratadi', 'Rasmning variantlarini yaratadi', 'Koʻplab vizual uslublarni sinash imkonini beradi', 'Natijani kattalashtiradi va takomillashtiradi'],
+      uses: ['Hikoya yoki oʻyin uchun konsept sanʼat', 'Dizayn loyihasi uchun kayfiyat taxtalari (moodboard)', 'Albom yoki plakat uchun gʻoyalar'],
+      pros: ['Ajoyib, badiiy natijalar', 'Faol jamoa va ulashilgan soʻrovlar', 'Vizual gʻoyalarni oʻrganish uchun yaxshi'],
+      cons: ['Pullik kirish; joriy variantlarni saytdan tekshiring', 'Yaxshi soʻrov yozishni mashq qilish kerak', 'Aniq, nozik tahrir qilish qiyin'],
+      keywords: 'rasm surat picture art sanʼat illustration concept art generate prompt style uslub fantasy poster plakat'
+    },
+    {
+      id: 'figma', name: 'Figma', mono: 'Fi', hue: 258, maker: 'Figma', url: 'https://www.figma.com',
+      cats: ['design'], goals: ['design'],
+      level: 'intermediate', pricing: 'freemium', popular: false,
+      tagline: 'Jamoa bilan hamkorlikdagi interfeys dizayni, AI imkoniyatlari bilan.',
+      description: 'Figma — ilova va veb-saytlarni jamoa bilan birga loyihalash uchun brauzer asosidagi vosita. Unda dizaynni yaratish va tahrirlashga yordam beradigan AI funksiyalari bor; qaysilari borligi rejangizga bogʻliq.',
+      does: ['Ilova va sayt ekranlarini loyihalaydi', 'Jamoadoshlar bilan jonli hamkorlik qiladi', 'Qayta ishlatiladigan komponentlar yaratadi', 'Dizaynni yaratish va tahrirlash uchun AI funksiyalarini beradi'],
+      uses: ['Ilova gʻoyasi ekranlarining eskizini chizish', 'Fikr olish uchun bosiladigan prototip ulashish', 'Jamoaning dizayn tizimini bir joyda saqlash'],
+      pros: ['Interfeys dizayni uchun sohadagi standart', 'Jamoaviy ish uchun ajoyib', 'Boshlash uchun bepul reja bor'],
+      cons: ['Oʻrganish vaqt oladi', 'AI funksiyalari rejaga bogʻliq', 'Oddiy grafika uchun ortiqcha boʻlishi mumkin'],
+      keywords: 'ui ux interfeys interface ilova app sayt website prototype wireframe mockup dizayner designer jamoa team'
+    },
+    {
+      id: 'runway', name: 'Runway', mono: 'Ru', hue: 240, maker: 'Runway', url: 'https://runwayml.com',
+      cats: ['video', 'image'], goals: ['video', 'images'],
+      level: 'intermediate', pricing: 'freemium', popular: true,
+      tagline: 'Ijodkorlar uchun AI video yaratish va montaj vositasi.',
+      description: 'Runway matn yoki rasmdan video yaratadigan va kadrlarni tahrirlashga yordam beradigan AI vositalarini taklif qiladi. U AI videoni sinab koʻrmoqchi boʻlgan ijodkorlar, rejissyorlar va dizaynerlarga moʻljallangan.',
+      does: ['Matn yoki rasmdan qisqa video lavhalar yaratadi', 'AI vositalari bilan videoni tahrirlaydi', 'Sahnaning qismlarini olib tashlaydi yoki oʻzgartiradi', 'Rasm yaratadi'],
+      uses: ['Harakatsiz rasmni jonlantirish', 'Taqdimot uchun qisqa konsept lavha yaratish', 'Mavjud kadrlarni tozalash yoki uslubini oʻzgartirish'],
+      pros: ['Video uchun keng vositalar toʻplami bir joyda', 'Ijodiy jamoalar orasida mashhur', 'Sinab koʻrish uchun bepul kreditlar bor'],
+      cons: ['Lavhalar qisqa va natijalar turlicha', 'Kreditlar tez tugaydi', 'Yaxshi natija uchun koʻp sinab koʻrish kerak'],
+      keywords: 'video film kino movie animation animatsiya clip lavha generate text to video montaj editing footage motion'
+    },
+    {
+      id: 'heygen', name: 'HeyGen', mono: 'HG', hue: 220, maker: 'HeyGen', url: 'https://www.heygen.com',
+      cats: ['video', 'business'], goals: ['video', 'business'],
+      level: 'beginner', pricing: 'freemium', popular: false,
+      tagline: 'AI avatarlar va ovoz bilan taqdimotchi videolar yaratish.',
+      description: 'HeyGen matnni AI avatar va ovozli video qilib beradi. Jamoalar undan oʻqitish, mahsulot tushuntirishlari va marketing videolari, shu jumladan boshqa tillardagi versiyalar uchun foydalanadi.',
+      does: ['Matnni taqdimotchi videosiga aylantiradi', 'AI avatar va ovozdan foydalanadi', 'Videolarni boshqa tillarga tarjima qiladi', 'Oʻqitish va marketing roliklari yaratadi'],
+      uses: ['Suratga olmasdan mahsulot tushuntirishi tayyorlash', 'Bir necha tilda oʻquv videolari yaratish', 'Tezkor salomlashuv xabari yaratish'],
+      pros: ['Kamera yoki studiya kerak emas', 'Koʻp tilli videolar uchun qulay', 'Sinab koʻrish uchun bepul variant bor'],
+      cons: ['Avatarlar sunʼiy koʻrinishi mumkin', 'Kredit va reja limitlari bor', 'Haqiqiy yuz va ovozlardan foydalanish qoidalarini tekshiring'],
+      keywords: 'avatar presenter taqdimotchi voiceover ovoz translate tarjima explainer training oʻqitish marketing script talking video'
+    },
+    {
+      id: 'notion-ai', name: 'Notion AI', mono: 'N', hue: 265, maker: 'Notion', url: 'https://www.notion.com/product/ai',
+      cats: ['productivity', 'writing'], goals: ['productivity', 'writing', 'business'],
+      level: 'beginner', pricing: 'paid', popular: false,
+      tagline: 'Notion dagi qayd, hujjat va loyihalaringiz ichidagi AI.',
+      description: 'Notion AI Notion ish maydonlari ichida ishlaydi. Sahifalarni qisqartira oladi, matn yozadi va qaydlaringiz hamda hujjatlaringiz boʻylab savollarga javob beradi. Mavjudligi Notion rejangizga bogʻliq.',
+      does: ['Qayd va sahifalarni qisqartiradi', 'Hujjatlaringizdagi matnni yozadi va qayta yozadi', 'Ish maydoningiz haqidagi savollarga javob beradi', 'Uchrashuv qaydlarini tartiblashga yordam beradi'],
+      uses: ['Uchrashuv qaydlarini vazifalar roʻyxatiga aylantirish', 'Uzun loyiha sahifasini qisqartirish', 'Reja uchun birinchi variantni yozish'],
+      pros: ['Qaydlaringiz turgan joyda ishlaydi', 'Notion ishlatsangiz sozlash deyarli yoʻq', 'Jamoa bilimlari uchun yaxshi'],
+      cons: ['Notion ish maydoni kerak', 'AI ga kirish pullik rejaga bogʻliq', 'Qaydlaringiz boshqa joyda boʻlsa, foydasi kam'],
+      keywords: 'qayd notes wiki docs hujjat project loyiha tasks vazifa meeting uchrashuv summarize xulosa organize workspace knowledge base'
+    },
+    {
+      id: 'otter', name: 'Otter.ai', mono: 'Ot', hue: 212, maker: 'Otter.ai', url: 'https://otter.ai',
+      cats: ['productivity', 'business'], goals: ['productivity', 'business'],
+      level: 'beginner', pricing: 'freemium', popular: false,
+      tagline: 'Uchrashuvlarni matnga aylantirish va avtomatik xulosa.',
+      description: 'Otter.ai uchrashuv va suhbatlarni yozib oladi va matnga aylantiradi, soʻng xulosa va vazifalar tayyorlaydi, shunda siz qayd yozish oʻrniga muhokamaga eʼtibor qaratasiz.',
+      does: ['Uchrashuv va qoʻngʻiroqlarni matnga aylantiradi', 'Xulosa va bajariladigan ishlar roʻyxatini tuzadi', 'Matnlarni qidiruv uchun qulay qiladi', 'Qaydlarni hamkasblar bilan ulashadi'],
+      uses: ['Jamoa qoʻngʻirogʻidan qaydlar olish', 'Oʻtgan hafta nima qaror qilinganini qidirib topish', 'Maʼruzani ruxsat bilan yozib olish va matnga aylantirish'],
+      pros: ['Qayd yozish vaqtini ancha tejaydi', 'Qidiriladigan matnlar', 'Cheklovli bepul reja bor'],
+      cons: ['Shovqin, kuchli aksent yoki qoʻllab-quvvatlanmaydigan tilda aniqlik pasayadi', 'Yozib olayotganingizni har doim qatnashchilarga ayting', 'Daqiqa va imkoniyatlarga reja limitlari qoʻllanadi'],
+      keywords: 'meeting uchrashuv transcript transcription matnga qayd notes record yozib olish audio call qoʻngʻiroq zoom lecture maʼruza summary xulosa action items'
+    },
+    {
+      id: 'notebooklm', name: 'NotebookLM', mono: 'NL', hue: 230, maker: 'Google', url: 'https://notebooklm.google.com',
+      cats: ['education', 'chat', 'productivity'], goals: ['learning', 'research', 'productivity'],
+      level: 'beginner', pricing: 'freemium', popular: true,
+      tagline: 'Oʻz manbalaringiz asosida javob beradigan tadqiqot daftari.',
+      description: 'NotebookLM hujjat va qaydlaringizni yuklab, shu manbalarga tayanib javob beradigan savollar berish imkonini beradi. Shuningdek, materialingizdan xulosa, oʻquv qoʻllanma va audio shaklidagi sharhlar yaratishi mumkin.',
+      does: ['Yuklangan manbalaringiz asosida savollarga javob beradi', 'Hujjat va qaydlarni qisqartiradi', 'Oʻquv qoʻllanma va sharhlar yaratadi', 'Manbada biror narsa qayerda borligini topishga yordam beradi'],
+      uses: ['Maʼruza qaydlaridan imtihonga tayyorlanish', 'Bir nechta PDF dan asosiy fikrlarni ajratib olish', 'Maqolalar toʻplamidan qisqa maʼruza materiali tayyorlash'],
+      pros: ['Javoblar sizning materialingizga bogʻliq qoladi', 'Oʻqish va tadqiqot uchun ajoyib', 'Boshlash bepul'],
+      cons: ['Qancha yaxshi manba bersangiz, shuncha yaxshi natija', 'Umumiy internet savollari uchun moʻljallanmagan', 'Imkoniyat va limitlar oʻzgarib turadi'],
+      keywords: 'study oʻqish notes qayd pdf documents hujjat sources manba summary xulosa study guide imtihon exam lecture maʼruza research tadqiqot podcast audio overview'
+    },
+    {
+      id: 'khanmigo', name: 'Khanmigo', mono: 'Km', hue: 255, maker: 'Khan Academy', url: 'https://www.khanmigo.ai',
+      cats: ['education'], goals: ['learning'],
+      level: 'beginner', pricing: 'varies', popular: false,
+      tagline: 'Khan Academy ning faqat javob bermay, yoʻl koʻrsatadigan AI repetitori.',
+      description: 'Khanmigo — Khan Academy ning AI repetitori va oʻqituvchi yordamchisi. U oʻquvchilarni savol va maslahatlar bilan yoʻnaltirishga, oʻqituvchilarga esa dars rejalashtirishga yordam berish uchun moʻljallangan.',
+      does: ['Oʻquvchilarga maslahat va savollar bilan repetitorlik qiladi', 'Matematika, yozuv va boshqalarni mashq qilishga yordam beradi', 'Oʻqituvchilarga dars gʻoyalarida yordam beradi', 'Khan Academy kontenti bilan birga ishlaydi'],
+      uses: ['Matematika mavzusini bosqichma-bosqich mashq qilish', 'Insho qoralamasi boʻyicha fikr olish', 'Oʻqituvchi sifatida darsni rejalashtirish'],
+      pros: ['Oʻrganish uchun yaratilgan, yoʻl-yoʻriq beradi', 'Taʼlim bilan shugʻullanadigan notijorat tashkilot qoʻllab-quvvatlaydi', 'Oʻquvchiga yoʻl koʻrsatishga eʼtibor beradi'],
+      cons: ['Kirish va narx hisob turi va hududga qarab farq qiladi', 'Asosan Khan Academy fanlariga qaratilgan', 'Umumiy yordamchi emas'],
+      keywords: 'tutor repetitor school maktab student oʻquvchi teacher oʻqituvchi homework uyga vazifa math matematika practice mashq lessons dars learn oʻrganish exam imtihon khan academy'
+    }
+  ];
+
+  var byId = {};
+  function norm(s) { return String(s).toLowerCase().replace(/[ʻʼ'‘’`´]/g, ''); }
+  function catLabel(id) {
+    for (var i = 0; i < CATEGORIES.length; i++) if (CATEGORIES[i].id === id) return CATEGORIES[i].label;
+    return id;
+  }
+  function goalById(id) { return GOALS.filter(function (g) { return g.id === id; })[0]; }
+  TOOLS.forEach(function (t) {
+    byId[t.id] = t;
+    var catLabels = t.cats.map(function (c) { return catLabel(c); }).join(' ');
+    t._h = norm([t.name, t.maker, t.tagline, t.description, t.does.join(' '), t.uses.join(' '), t.keywords, catLabels].join(' '));
+  });
+
+  /* ---------- Helpers ---------- */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  var store = {
+    get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+  };
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function monoStyle(t) {
+    return 'background:linear-gradient(135deg,hsl(' + t.hue + ' 82% 62%),hsl(' + (t.hue + 38) + ' 88% 50%))';
+  }
+  /* Logo: try logos/<id>.png (your own file), then the official site's icon, then the monogram letters. */
+  function logoHost(t) { try { return new URL(t.url).hostname; } catch (e) { return ''; } }
+  function monoInner(t) {
+    return '<span class="mono-letters">' + esc(t.mono) + '</span>' +
+      '<img class="logo-img" alt="" decoding="async" referrerpolicy="no-referrer" data-step="0" data-host="' + esc(logoHost(t)) + '" src="logos/' + t.id + '.png">';
+  }
+  function monoTile(t, big) {
+    return '<span class="mono-tile' + (big ? ' lg' : '') + '" style="' + monoStyle(t) + '" aria-hidden="true">' + monoInner(t) + '</span>';
+  }
+  function priceTag(t) {
+    var m = t.pricing;
+    var cls = (m === 'free' || m === 'freemium') ? 'free' : (m === 'paid' ? 'paid' : '');
+    return '<span class="tag ' + cls + '">' + PRICE_TEXT[m] + '</span>';
+  }
+  function countFor(catId) { return TOOLS.filter(function (t) { return t.cats.indexOf(catId) !== -1; }).length; }
+
+  /* ---------- State ---------- */
+  var state = {
+    route: { page: 'home', id: null },
+    favs: new Set((store.get('aihub:favs', []) || []).filter(function (id) { return byId[id]; })),
+    theme: store.get('aihub:theme', 'dark') === 'light' ? 'light' : 'dark',
+    explore: { q: '', cat: 'all', price: 'any', level: 'any', sort: 'popular', saved: false },
+    advisor: { goal: '', budget: '', level: '', result: null }
+  };
+  var view = $('#view');
+
+  /* ---------- Theme, toast, header ---------- */
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', state.theme);
+    var btn = $('#themeBtn');
+    btn.innerHTML = ic(state.theme === 'dark' ? 'sun' : 'moon');
+    btn.setAttribute('aria-label', state.theme === 'dark' ? 'Yorugʻ rejimga oʻtish' : 'Qorongʻu rejimga oʻtish');
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $('#toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+  }
+  function setMenu(open) {
+    $('#siteHeader').classList.toggle('open', open);
+    var b = $('#menuBtn');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    b.setAttribute('aria-label', open ? 'Menyuni yopish' : 'Menyuni ochish');
+    b.innerHTML = ic(open ? 'close' : 'menu');
+  }
+  function updateSavedCount() { $('#savedCount').textContent = String(state.favs.size); }
+
+  /* ---------- Favorites ---------- */
+  function toggleFav(id) {
+    var t = byId[id];
+    if (!t) return;
+    if (state.favs.has(id)) { state.favs.delete(id); toast(t.name + ' saqlanganlardan olib tashlandi'); }
+    else { state.favs.add(id); toast(t.name + ' saqlandi'); }
+    store.set('aihub:favs', Array.from(state.favs));
+    updateSavedCount();
+    var on = state.favs.has(id);
+    document.querySelectorAll('[data-fav="' + id + '"]').forEach(function (b) {
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var lbl = b.querySelector('.fav-label');
+      if (lbl) lbl.textContent = on ? 'Saqlandi' : 'Saqlash';
+      if (!b.classList.contains('text')) b.setAttribute('aria-label', on ? t.name + ' ni saqlanganlardan olib tashlash' : t.name + ' ni saqlash');
+    });
+    if (state.route.page === 'explore' && state.explore.saved) updateResults();
+  }
+  function favButton(t, text) {
+    var on = state.favs.has(t.id);
+    if (text) {
+      return '<button class="fav text" type="button" data-fav="' + t.id + '" aria-pressed="' + on + '">' + ic('heart') + '<span class="fav-label">' + (on ? 'Saqlandi' : 'Saqlash') + '</span></button>';
+    }
+    return '<button class="fav" type="button" data-fav="' + t.id + '" aria-pressed="' + on + '" aria-label="' + esc(on ? t.name + ' ni saqlanganlardan olib tashlash' : t.name + ' ni saqlash') + '">' + ic('heart') + '</button>';
+  }
+
+  /* ---------- Routing ---------- */
+  function parseHash() {
+    var h = (location.hash || '').replace('#', '');
+    if (h.indexOf('tool-') === 0) return { page: 'tool', id: h.slice(5) };
+    if (h === 'explore' || h === 'advisor' || h === 'home') return { page: h, id: null };
+    return { page: 'home', id: null };
+  }
+  function go(page, id) {
+    state.route = { page: page, id: id || null };
+    try { location.hash = page === 'tool' ? 'tool-' + id : page; } catch (e) { /* ignore */ }
+    setMenu(false);
+    render();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', function () {
+    var r = parseHash();
+    if (r.page !== state.route.page || r.id !== state.route.id) {
+      state.route = r;
+      setMenu(false);
+      render();
+      window.scrollTo(0, 0);
+    }
+  });
+
+  /* ---------- Search ---------- */
+  var STOP = ['va', 'uchun', 'bilan', 'men', 'ni', 'ga', 'da', 'dan', 'bir', 'ai', 'vosita', 'vositalar', 'kerak', 'qanday', 'the', 'and', 'for', 'with', 'to', 'of', 'my', 'me', 'an', 'is', 'in', 'on', 'it', 'do', 'can', 'how', 'make', 'create', 'want', 'need', 'some', 'tool', 'tools'];
+  function tokens(q) {
+    return norm(q).split(/[^\p{L}\p{N}+#.]+/u).filter(function (w) { return w.length >= 2 && STOP.indexOf(w) === -1; });
+  }
+  function matchScore(t, toks) {
+    var s = 0;
+    toks.forEach(function (w) {
+      if (t._h.indexOf(w) !== -1) s += 1;
+      if (norm(t.name).indexOf(w) !== -1) s += 2;
+    });
+    return s;
+  }
+  function filterTools() {
+    var e = state.explore;
+    var toks = tokens(e.q);
+    var list = TOOLS.map(function (t) { return { t: t, s: toks.length ? matchScore(t, toks) : 1 }; })
+      .filter(function (x) { return x.s > 0; });
+    if (e.cat !== 'all') list = list.filter(function (x) { return x.t.cats.indexOf(e.cat) !== -1; });
+    if (e.price === 'free') list = list.filter(function (x) { return x.t.pricing === 'free' || x.t.pricing === 'freemium'; });
+    if (e.price === 'paid') list = list.filter(function (x) { return x.t.pricing === 'paid'; });
+    if (e.level !== 'any') list = list.filter(function (x) { return x.t.level === e.level; });
+    if (e.saved) list = list.filter(function (x) { return state.favs.has(x.t.id); });
+    list.sort(function (a, b) {
+      if (toks.length && b.s !== a.s) return b.s - a.s;
+      if (e.sort === 'az') return a.t.name.localeCompare(b.t.name);
+      var p = Number(b.t.popular) - Number(a.t.popular);
+      return p || a.t.name.localeCompare(b.t.name);
+    });
+    return list.map(function (x) { return x.t; });
+  }
+
+  /* ---------- Views ---------- */
+  function toolCard(t) {
+    return '<article class="card glass">' +
+      '<div class="card-top">' + monoTile(t) + favButton(t) + '</div>' +
+      '<h3><a href="#tool-' + t.id + '" data-go="tool" data-id="' + t.id + '">' + esc(t.name) + '</a></h3>' +
+      '<p class="maker">Ishlab chiquvchi: ' + esc(t.maker) + '</p>' +
+      '<p class="tagline">' + esc(t.tagline) + '</p>' +
+      '<div class="tags">' + t.cats.slice(0, 2).map(function (c) { return '<span class="tag">' + esc(catLabel(c)) + '</span>'; }).join('') + priceTag(t) + '</div>' +
+      '</article>';
+  }
+
+  function orbitHtml() {
+    var outer = ['claude', 'chatgpt', 'gemini', 'perplexity', 'github-copilot', 'canva'];
+    var inner = ['firefly', 'runway', 'notebooklm'];
+    function slots(ids) {
+      return ids.map(function (id, i) {
+        var t = byId[id];
+        var a = Math.round((360 / ids.length) * i);
+        return '<div class="slot" style="--a:' + a + 'deg"><button class="tile" type="button" data-go="tool" data-id="' + id + '" aria-label="' + esc(t.name) + '" style="' + monoStyle(t) + '">' + monoInner(t) + '</button></div>';
+      }).join('');
+    }
+    return '<div class="orbit" aria-label="Mashhur AI vositalari">' +
+      '<div class="ring r1"></div><div class="ring r2"></div>' +
+      '<div class="spin outer">' + slots(outer) + '</div>' +
+      '<div class="spin inner">' + slots(inner) + '</div>' +
+      '<div class="core" aria-hidden="true">AI</div></div>';
+  }
+
+  function viewHome() {
+    var pop = ['claude', 'chatgpt', 'gemini', 'perplexity', 'github-copilot', 'canva'].map(function (id) { return byId[id]; });
+    var quick = ['Kod yozish', 'PDF xulosasi', 'Logo yasash', 'Video yaratish', 'Imtihonga tayyorlanish'];
+    return '<div class="wrap">' +
+      '<section class="hero">' +
+        '<div>' +
+          '<span class="eyebrow mono rise"><i></i>AI vositalari uchun yoʻlboshchi</span>' +
+          '<h1 class="rise d2">Har qanday ish uchun <span class="grad-text">toʻgʻri AI</span> ni toping.</h1>' +
+          '<p class="lead rise d3">AI vositalarini ular aslida nima qilishiga qarab solishtiring, soʻng maqsadingiz, byudjetingiz va tajribangizga mos uchta tavsiya oling.</p>' +
+          '<form class="searchbar rise d3" id="homeSearch" novalidate role="search">' +
+            ic('search') +
+            '<label class="sr-only" for="homeQ">Nima qilmoqchisiz?</label>' +
+            '<input id="homeQ" type="search" placeholder="Nima qilmoqchisiz? Masalan: kod yozish, logo yasash" autocomplete="off" maxlength="80">' +
+            '<button class="btn primary" type="submit">AI topish</button>' +
+          '</form>' +
+          '<p class="form-msg" id="homeMsg" role="alert" hidden></p>' +
+          '<div class="quick rise d4"><span class="mono">Sinab koʻring</span>' +
+            quick.map(function (q) { return '<button class="chip" type="button" data-quick="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') +
+          '</div>' +
+          '<div class="cta-row rise d4">' +
+            '<a class="btn primary" href="#explore" data-go="explore">AI vositalarini koʻrish ' + ic('arrow') + '</a>' +
+            '<a class="btn" href="#advisor" data-go="advisor">AI maslahatchidan soʻrash</a>' +
+          '</div>' +
+          '<p class="mono hero-stats">' + TOOLS.length + ' ta vosita · ' + CATEGORIES.length + ' ta kategoriya · roʻyxatdan oʻtish shart emas</p>' +
+        '</div>' +
+        '<div class="rise d3">' + orbitHtml() + '</div>' +
+      '</section>' +
+
+      '<section class="section" aria-labelledby="popH">' +
+        '<div class="section-head"><div><h2 id="popH">Mashhur AI vositalari</h2><p>Koʻpchilik boshlaydigan yordamchi va ijodiy vositalar.</p></div>' +
+        '<a class="link-arrow" href="#explore" data-go="explore">Barcha vositalar ' + ic('arrow') + '</a></div>' +
+        '<div class="grid">' + pop.map(toolCard).join('') + '</div>' +
+      '</section>' +
+
+      '<section class="section" aria-labelledby="catH">' +
+        '<div class="section-head"><div><h2 id="catH">Kategoriya boʻyicha koʻrish</h2><p>Ish turini tanlang va unga mos vositalarni koʻring.</p></div></div>' +
+        '<div class="cat-grid">' + CATEGORIES.map(function (c) {
+          var n = countFor(c.id);
+          return '<button class="cat glass" type="button" data-go="explore" data-cat="' + c.id + '">' +
+            '<span class="ico">' + ic(c.icon) + '</span><strong>' + esc(c.label) + '</strong>' +
+            '<span class="maker">' + esc(c.blurb) + '</span><small>' + n + ' ta vosita</small></button>';
+        }).join('') + '</div>' +
+      '</section>' +
+
+      '<section class="section">' +
+        '<div class="cta-band">' +
+          '<div><h2>Qayerdan boshlashni bilmayapsizmi?</h2><p>Maqsadingiz, byudjetingiz va tajribangiz haqida uchta savolga javob bering. Katalogdan sabablari va kamchiliklari bilan uchta vosita tavsiya qilinadi.</p></div>' +
+          '<a class="btn primary" href="#advisor" data-go="advisor">AI maslahatchini ochish ' + ic('arrow') + '</a>' +
+        '</div>' +
+      '</section>' +
+    '</div>';
+  }
+
+  function viewExplore() {
+    var e = state.explore;
+    function opt(v, l, cur) { return '<option value="' + v + '"' + (cur === v ? ' selected' : '') + '>' + l + '</option>'; }
+    return '<div class="wrap">' +
+      '<div class="page-head"><span class="mono">Katalog</span><h1>AI katalogi</h1>' +
+      '<p>Katalogdan qidiring yoki kategoriya, narx va tajriba darajasi boʻyicha saralang. Batafsil maʼlumot uchun kartani bosing.</p></div>' +
+      '<div class="filters glass">' +
+        '<div class="search-field">' + ic('search') +
+          '<label class="sr-only" for="q">Vositalarni qidirish</label>' +
+          '<input class="field" id="q" type="search" placeholder="Vosita yoki vazifa boʻyicha qidiring, masalan: kod, logo, matnga aylantirish" autocomplete="off" maxlength="80" value="' + esc(e.q) + '"></div>' +
+        '<div class="chips" role="group" aria-label="Kategoriyalar" id="catChips">' +
+          '<button class="chip" type="button" data-catchip="all" aria-pressed="false">Barchasi</button>' +
+          CATEGORIES.map(function (c) { return '<button class="chip" type="button" data-catchip="' + c.id + '" aria-pressed="false">' + esc(c.label) + '</button>'; }).join('') +
+        '</div>' +
+        '<div class="selects">' +
+          '<label><span class="mono">Narx</span><select class="field" id="fPrice">' + opt('any', 'Hammasi', e.price) + opt('free', 'Bepul rejasi bor', e.price) + opt('paid', 'Faqat pullik', e.price) + '</select></label>' +
+          '<label><span class="mono">Tajriba</span><select class="field" id="fLevel">' + opt('any', 'Har qanday daraja', e.level) + opt('beginner', 'Yangi boshlovchilarga mos', e.level) + opt('intermediate', 'Biroz tajriba kerak', e.level) + opt('advanced', 'Ilgʻor', e.level) + '</select></label>' +
+          '<label><span class="mono">Saralash</span><select class="field" id="fSort">' + opt('popular', 'Eng mashhur', e.sort) + opt('az', 'Nomi boʻyicha (A–Z)', e.sort) + '</select></label>' +
+          '<button class="chip" type="button" id="savedOnly" aria-pressed="false">' + ic('heart') + 'Faqat saqlanganlar</button>' +
+        '</div>' +
+      '</div>' +
+      '<p class="result-count" id="resultCount" aria-live="polite"></p>' +
+      '<div class="grid" id="results"></div>' +
+    '</div>';
+  }
+
+  function syncExploreChips() {
+    var e = state.explore;
+    document.querySelectorAll('[data-catchip]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-catchip') === e.cat ? 'true' : 'false');
+    });
+    var s = $('#savedOnly');
+    if (s) s.setAttribute('aria-pressed', e.saved ? 'true' : 'false');
+  }
+  function updateResults() {
+    var e = state.explore;
+    var list = filterTools();
+    var grid = $('#results');
+    var count = $('#resultCount');
+    if (!grid) return;
+    var parts = [];
+    if (e.cat !== 'all') parts.push('kategoriya: ' + catLabel(e.cat));
+    if (e.q.trim()) parts.push('qidiruv: “' + e.q.trim() + '”');
+    count.textContent = list.length + ' ta vosita' + (parts.length ? ' · ' + parts.join(' · ') : ' katalogda');
+    if (!list.length) {
+      var msg, title;
+      if (e.saved && !state.favs.size) {
+        title = 'Sizda hali saqlangan vosita yoʻq';
+        msg = 'Istalgan kartadagi yurakcha tugmasini bosing, vosita shu yerda saqlanadi.';
+      } else {
+        title = 'Filtrlarga mos vosita topilmadi';
+        msg = 'Soʻzlarni qisqartiring, boshqa kategoriyani tanlang yoki filtrlarni tozalang.';
+      }
+      grid.innerHTML = '<div class="empty glass"><h3>' + title + '</h3><p>' + msg + '</p><button class="btn primary" type="button" id="clearFilters">Filtrlarni tozalash</button></div>';
+    } else {
+      grid.innerHTML = list.map(toolCard).join('');
+    }
+    syncExploreChips();
+  }
+
+  function viewTool(id) {
+    var t = byId[id];
+    if (!t) {
+      return '<div class="wrap"><div class="page-head"><h1>Vosita topilmadi</h1><p>Bu manzil boʻyicha vosita topilmadi. U qayta nomlangan yoki olib tashlangan boʻlishi mumkin.</p></div>' +
+        '<a class="btn primary" href="#explore" data-go="explore">AI katalogiga qaytish</a></div>';
+    }
+    var similar = TOOLS.filter(function (o) { return o.id !== t.id && o.cats[0] === t.cats[0]; }).slice(0, 3);
+    if (similar.length < 2) {
+      similar = TOOLS.filter(function (o) { return o.id !== t.id && o.cats.some(function (c) { return t.cats.indexOf(c) !== -1; }); }).slice(0, 3);
+    }
+    function list(items, cls) { return '<ul class="bullets ' + (cls || '') + '">' + items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>'; }
+    return '<div class="wrap">' +
+      '<a class="crumb" href="#explore" data-go="explore">' + ic('arrow') + 'AI katalogiga qaytish</a>' +
+      '<section class="detail-head glass">' + monoTile(t, true) +
+        '<div class="who"><span class="mono">Ishlab chiquvchi: ' + esc(t.maker) + '</span><h1>' + esc(t.name) + '</h1><p class="tagline">' + esc(t.tagline) + '</p>' +
+          '<div class="tags" style="margin-top:.8rem">' + t.cats.map(function (c) { return '<span class="tag">' + esc(catLabel(c)) + '</span>'; }).join('') + priceTag(t) + '</div>' +
+          '<div class="detail-actions">' +
+            '<a class="btn primary" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer">Rasmiy saytga oʻtish ' + ic('ext') + '</a>' +
+            favButton(t, true) +
+          '</div></div>' +
+      '</section>' +
+      '<div class="detail-grid">' +
+        '<div class="stack">' +
+          '<section class="panel glass"><h2>Haqida</h2><p>' + esc(t.description) + '</p></section>' +
+          '<section class="panel glass"><h2>Nima qiladi</h2>' + list(t.does) + '</section>' +
+          '<section class="panel glass"><h2>Foydalanish misollari</h2>' + list(t.uses) + '</section>' +
+          '<section class="panel glass"><h2>Afzalliklari</h2>' + list(t.pros) + '</section>' +
+          '<section class="panel glass"><h2>Cheklovlari</h2>' + list(t.cons, 'warn') + '</section>' +
+        '</div>' +
+        '<aside class="stack" aria-label="Qisqacha maʼlumot">' +
+          '<section class="panel glass"><h2>Qisqacha</h2><div class="kv">' +
+            '<div><span class="mono">Tajriba darajasi</span><strong>' + LEVEL_TEXT[t.level] + '</strong></div>' +
+            '<div><span class="mono">Narx</span><strong>' + PRICE_TEXT[t.pricing] + '</strong></div>' +
+            '<div><span class="mono">Qaysi maqsad uchun</span><strong>' + t.goals.slice(0, 3).map(function (g) { return esc(goalById(g).label); }).join(', ') + '</strong></div>' +
+          '</div><p class="note">' + PRICE_NOTE + '</p></section>' +
+          (similar.length ? '<section class="panel glass"><h2>Oʻxshash vositalar</h2><div class="stack">' + similar.map(function (o) {
+            return '<a class="mini" href="#tool-' + o.id + '" data-go="tool" data-id="' + o.id + '">' + monoTile(o) + '<span><strong>' + esc(o.name) + '</strong><small>' + esc(o.maker) + '</small></span></a>';
+          }).join('') + '</div></section>' : '') +
+        '</aside>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function radioGroup(name, qid, number, title, items, current) {
+    return '<fieldset class="q" id="' + qid + '" data-q="' + name + '">' +
+      '<legend><span class="mono">Savol ' + number + ' / 3</span><span class="qlabel">' + title + '</span></legend>' +
+      '<div class="opts">' + items.map(function (it) {
+        return '<label class="opt"><input type="radio" name="' + name + '" value="' + it.id + '"' + (current === it.id ? ' checked' : '') + '>' +
+          '<span class="opt-body"><strong>' + esc(it.label) + '</strong><small>' + esc(it.hint) + '</small></span></label>';
+      }).join('') + '</div>' +
+      '<p class="err" id="err-' + name + '" hidden></p></fieldset>';
+  }
+  function viewAdvisor() {
+    var a = state.advisor;
+    return '<div class="wrap">' +
+      '<div class="page-head"><span class="mono">Yoʻnaltirilgan tanlov</span><h1>AI maslahatchi</h1>' +
+      '<p>Uchta savolga javob bering. Katalogdan uchta vositani, nega mosligini va nimalarga eʼtibor berish kerakligini koʻrsatamiz.</p></div>' +
+      '<form class="advisor-wrap" id="advisorForm" novalidate>' +
+        radioGroup('goal', 'q-goal', 1, 'Nima qilmoqchisiz?', GOALS, a.goal) +
+        radioGroup('budget', 'q-budget', 2, 'Bepul vosita kerakmi yoki pullisi ham mumkinmi?', BUDGETS, a.budget) +
+        radioGroup('level', 'q-level', 3, 'AI vositalari bilan tajribangiz qanday?', LEVELS, a.level) +
+        '<div class="form-actions"><button class="btn primary" type="submit">3 ta tavsiyani olish ' + ic('arrow') + '</button>' +
+          '<button class="btn" type="button" id="advReset">Qaytadan boshlash</button></div>' +
+        '<p class="form-msg" id="advMsg" role="alert" hidden></p>' +
+      '</form>' +
+      '<div class="results" id="advResults" aria-live="polite" tabindex="-1"></div>' +
+    '</div>';
+  }
+
+  /* ---------- Advisor logic ---------- */
+  function recommend(ans) {
+    var scored = TOOLS.map(function (t) {
+      var matchesGoal = t.goals.indexOf(ans.goal) !== -1;
+      var s = 0, blocked = false;
+      if (matchesGoal) { s += 10; if (t.goals[0] === ans.goal) s += 3; }
+      if (ans.budget === 'free') {
+        if (t.pricing === 'paid') blocked = true;
+        else if (t.pricing === 'freemium') s += 3;
+        else if (t.pricing === 'varies') s -= 3;
+      } else if (ans.budget === 'freemium') {
+        if (t.pricing === 'freemium') s += 2;
+      } else if (t.pricing === 'paid') { s += 1; }
+      var diff = LEVEL_RANK[t.level] - LEVEL_RANK[ans.level];
+      if (diff > 0) s -= diff * 3; else if (diff === 0) s += 2; else s -= 0.5;
+      if (t.popular) s += 1;
+      return { t: t, s: s, matchesGoal: matchesGoal, blocked: blocked };
+    });
+    var good = scored.filter(function (x) { return x.matchesGoal && !x.blocked; }).sort(function (a, b) { return b.s - a.s; });
+    var picks = good.slice(0, 3).map(function (x) { return { t: x.t, partial: false }; });
+    if (picks.length < 3) {
+      var rest = scored.filter(function (x) { return !x.blocked && !x.matchesGoal; }).sort(function (a, b) { return b.s - a.s; });
+      rest.slice(0, 3 - picks.length).forEach(function (x) { picks.push({ t: x.t, partial: true }); });
+    }
+    return picks;
+  }
+  function reasonsFor(t, ans, partial) {
+    var g = goalById(ans.goal);
+    var out = [];
+    out.push(partial
+      ? '“' + g.label + '” uchun asosiy moʻljallanmagan, lekin katalogdagi eng yaqin variant.'
+      : 'Maqsadingizga mos (' + g.label.toLowerCase() + '). ' + t.pros[0] + '.');
+    if (ans.budget === 'free') {
+      out.push(t.pricing === 'varies' ? 'Narxi hisob turiga bogʻliq, sizga bepul ekanini tekshirib koʻring.' : 'Bepul rejasi bor, bu “faqat bepul” talabingizga mos. Bepul rejalarda cheklovlar boʻladi.');
+    } else if (ans.budget === 'freemium') {
+      out.push(t.pricing === 'paid' ? 'Bu pullik vosita, pul toʻlashga tayyorligingizga mos keladi.' : 'Bepul boshlab, cheklovga yetganda pullikka oʻtishingiz mumkin.');
+    } else {
+      out.push('Pullik rejalar sizga maʼqul, shuning uchun yuqori limit va qoʻshimcha imkoniyatlardan foydalanish mumkin.');
+    }
+    var d = LEVEL_RANK[t.level] - LEVEL_RANK[ans.level];
+    if (d > 0) out.push('Darajasi: “' + LEVEL_TEXT[t.level].toLowerCase() + '”, shuning uchun sizning darajangizda oʻrganishga biroz vaqt ketadi.');
+    else if (d === 0) out.push('Tajriba darajangizga mos (' + LEVEL_TEXT[t.level].toLowerCase() + ').');
+    else out.push('Sizning darajangizdan osonroq, hoziroq boshlashingiz mumkin.');
+    return out;
+  }
+  function renderResults() {
+    var box = $('#advResults');
+    if (!box) return;
+    var a = state.advisor;
+    if (!a.result) { box.innerHTML = ''; return; }
+    var labels = ['Eng mos', 'Kuchli muqobil', 'Yana bir yaxshi variant'];
+    var partialCount = a.result.filter(function (r) { return r.partial; }).length;
+    box.innerHTML = '<h2>Sizning 3 ta tavsiyangiz</h2>' +
+      '<p class="maker">Maqsad: ' + esc(goalById(a.goal).label) + ' · Byudjet: ' + esc(BUDGETS.filter(function (b) { return b.id === a.budget; })[0].label) + ' · Daraja: ' + esc(LEVELS.filter(function (l) { return l.id === a.level; })[0].label) + '</p>' +
+      (partialCount ? '<p class="disclaimer">Namunaviy katalogda barcha javoblaringizga mos keladigan faqat ' + (3 - partialCount) + ' ta vosita bor, qolganlari qisman mos deb belgilandi.</p>' : '') +
+      a.result.map(function (r, i) {
+        var t = r.t;
+        return '<article class="rec glass">' +
+          '<div class="rec-head">' + monoTile(t, true) +
+            '<div class="who"><span class="mono rank' + (i === 0 ? ' top' : '') + '">' + labels[i] + (r.partial ? ' · qisman mos' : '') + '</span>' +
+              '<h3>' + esc(t.name) + '</h3><p class="tagline">' + esc(t.tagline) + '</p>' +
+              '<div class="tags" style="margin-top:.6rem">' + priceTag(t) + '<span class="tag">' + LEVEL_TEXT[t.level] + '</span></div></div>' +
+          '</div>' +
+          '<div class="rec-cols">' +
+            '<div><h4>Nega mos</h4><ul class="bullets">' + reasonsFor(t, a, r.partial).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+            '<div><h4>Asosiy vazifasi</h4><ul class="bullets">' + t.does.slice(0, 3).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+            '<div><h4>Esda tuting</h4><ul class="bullets warn">' + t.cons.slice(0, 2).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+          '</div>' +
+          '<div class="rec-actions">' +
+            '<a class="btn primary small" href="#tool-' + t.id + '" data-go="tool" data-id="' + t.id + '">Batafsil</a>' +
+            '<a class="btn small" href="' + esc(t.url) + '" target="_blank" rel="noopener noreferrer">Rasmiy sayt ' + ic('ext') + '</a>' +
+            favButton(t, true) +
+          '</div></article>';
+      }).join('') +
+      '<p class="disclaimer">Bu tavsiyalar shu sahifadagi namunaviy katalog va oddiy hisoblash qoidalariga asoslangan. Bu jonli AI javobi emas. Joriy rejalarni rasmiy saytlarda tekshiring.</p>';
+  }
+
+  /* ---------- Render ---------- */
+  function render() {
+    var r = state.route, html;
+    if (r.page === 'explore') html = viewExplore();
+    else if (r.page === 'advisor') html = viewAdvisor();
+    else if (r.page === 'tool') html = viewTool(r.id);
+    else html = viewHome();
+    view.innerHTML = html;
+    if (r.page === 'explore') updateResults();
+    if (r.page === 'advisor') renderResults();
+    document.querySelectorAll('[data-nav]').forEach(function (a) {
+      var active = (r.page === a.getAttribute('data-nav')) || (r.page === 'tool' && a.getAttribute('data-nav') === 'explore');
+      if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    updateSavedCount();
+    try { view.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+  }
+
+  /* ---------- Events ---------- */
+  /* Logo loading: local file first, then the official site icon, then keep the monogram letters. */
+  document.addEventListener('error', function (ev) {
+    var el = ev.target;
+    if (!el || el.tagName !== 'IMG' || !el.classList.contains('logo-img')) return;
+    var host = el.getAttribute('data-host');
+    if (el.getAttribute('data-step') === '0' && host) {
+      el.setAttribute('data-step', '1');
+      el.src = 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=128';
+    } else {
+      el.remove();
+    }
+  }, true);
+  document.addEventListener('load', function (ev) {
+    var el = ev.target;
+    if (el && el.tagName === 'IMG' && el.classList.contains('logo-img') && el.naturalWidth > 1 && el.parentNode) {
+      el.parentNode.classList.add('has-logo');
+    }
+  }, true);
+
+  document.addEventListener('click', function (ev) {
+    var t = ev.target;
+    var fav = t.closest('[data-fav]');
+    if (fav) { ev.preventDefault(); toggleFav(fav.getAttribute('data-fav')); return; }
+
+    var quick = t.closest('[data-quick]');
+    if (quick) {
+      state.explore = { q: quick.getAttribute('data-quick'), cat: 'all', price: 'any', level: 'any', sort: 'popular', saved: false };
+      go('explore');
+      return;
+    }
+    var nav = t.closest('[data-go]');
+    if (nav) {
+      var page = nav.getAttribute('data-go');
+      if (nav.tagName === 'A' && (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1)) return;
+      ev.preventDefault();
+      if (page === 'explore' && nav.hasAttribute('data-cat')) {
+        state.explore = { q: '', cat: nav.getAttribute('data-cat'), price: 'any', level: 'any', sort: 'popular', saved: false };
+      }
+      go(page, nav.getAttribute('data-id'));
+      return;
+    }
+    var chip = t.closest('[data-catchip]');
+    if (chip) { state.explore.cat = chip.getAttribute('data-catchip'); updateResults(); return; }
+    if (t.closest('#savedOnly')) { state.explore.saved = !state.explore.saved; updateResults(); return; }
+    if (t.closest('#clearFilters')) {
+      state.explore = { q: '', cat: 'all', price: 'any', level: 'any', sort: 'popular', saved: false };
+      render();
+      return;
+    }
+    if (t.closest('#advReset')) {
+      state.advisor = { goal: '', budget: '', level: '', result: null };
+      render();
+      return;
+    }
+    if (t.closest('#savedBtn')) {
+      state.explore = { q: '', cat: 'all', price: 'any', level: 'any', sort: 'popular', saved: true };
+      go('explore');
+      return;
+    }
+    if (t.closest('#themeBtn')) {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      store.set('aihub:theme', state.theme);
+      applyTheme();
+      return;
+    }
+    if (t.closest('#menuBtn')) { setMenu(!$('#siteHeader').classList.contains('open')); return; }
+  });
+
+  document.addEventListener('input', function (ev) {
+    if (ev.target.id === 'q') { state.explore.q = ev.target.value; updateResults(); }
+    if (ev.target.id === 'homeQ') {
+      var m = $('#homeMsg');
+      if (m && !m.hidden) { m.hidden = true; ev.target.removeAttribute('aria-invalid'); }
+    }
+  });
+  document.addEventListener('change', function (ev) {
+    var el = ev.target;
+    if (el.id === 'fPrice') { state.explore.price = el.value; updateResults(); }
+    else if (el.id === 'fLevel') { state.explore.level = el.value; updateResults(); }
+    else if (el.id === 'fSort') { state.explore.sort = el.value; updateResults(); }
+    else if (el.name === 'goal' || el.name === 'budget' || el.name === 'level') {
+      state.advisor[el.name] = el.value;
+      var q = el.closest('.q');
+      if (q) { q.classList.remove('has-error'); var er = $('#err-' + el.name); if (er) er.hidden = true; }
+    }
+  });
+
+  document.addEventListener('submit', function (ev) {
+    var form = ev.target;
+    if (form.id === 'homeSearch') {
+      ev.preventDefault();
+      var input = $('#homeQ'), msg = $('#homeMsg');
+      var val = input.value.trim();
+      if (val.length < 2) {
+        msg.textContent = val ? 'Kamida 2 ta belgi kiriting, masalan “kod” yoki “logo”.' : 'Avval nima qilmoqchi ekaningizni yozing, masalan “kod yozish” yoki “logo yasash”.';
+        msg.hidden = false;
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+        return;
+      }
+      state.explore = { q: val, cat: 'all', price: 'any', level: 'any', sort: 'popular', saved: false };
+      go('explore');
+    }
+    if (form.id === 'advisorForm') {
+      ev.preventDefault();
+      var a = state.advisor;
+      var missing = [];
+      [['goal', 'maqsadingiz'], ['budget', 'byudjetingiz'], ['level', 'tajriba darajangiz']].forEach(function (pair) {
+        var key = pair[0];
+        var q = $('#q-' + key), er = $('#err-' + key);
+        if (!a[key]) {
+          missing.push(pair[1]);
+          q.classList.add('has-error');
+          er.textContent = 'Iltimos, bitta variantni tanlang.';
+          er.hidden = false;
+        } else {
+          q.classList.remove('has-error');
+          er.hidden = true;
+        }
+      });
+      var m = $('#advMsg');
+      if (missing.length) {
+        m.textContent = 'Deyarli tayyor. Iltimos, quyidagilarga javob bering: ' + missing.join(', ') + '.';
+        m.hidden = false;
+        var firstBad = $('.q.has-error input');
+        if (firstBad) firstBad.focus();
+        return;
+      }
+      m.hidden = true;
+      a.result = recommend(a);
+      renderResults();
+      var box = $('#advResults');
+      try { box.scrollIntoView({ behavior: 'smooth', block: 'start' }); box.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+    }
+  });
+
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && $('#siteHeader').classList.contains('open')) { setMenu(false); $('#menuBtn').focus(); }
+  });
+
+  /* ---------- Init ---------- */
+  $('#savedIcon').innerHTML = ic('heart');
+  setMenu(false);
+  applyTheme();
+  state.route = parseHash();
+  render();
+})();
+</script>
+
+</body></html>
